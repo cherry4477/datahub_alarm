@@ -155,7 +155,7 @@ func connectMQ() {
 
 	//AlarmMQ.SendSyncMessage(MQ_TOPIC_TO_ALARM, []byte(""), []byte("")) // force create the topic
 	// 0 is the partition id
-	err = AlarmMQ.SetMessageListener(MQ_TOPIC_TO_ALARM, 0, mq.Offset_Newest, myListener)
+	err = AlarmMQ.SetMessageListener(MQ_TOPIC_TO_ALARM, 0, mq.Offset_Marked, myListener)
 	if err != nil {
 		log.Error("SetMessageListener (to_alarm.json) error: ", err)
 	}
