@@ -239,7 +239,7 @@ func main() {
 	go refreshKafka()
 
 	router := httprouter.New()
-	router.GET("/", rootHandler)
+	router.GET("/alarm", rootHandler)
 
 	log.Info("listening on", SERVICE_PORT)
 	err := http.ListenAndServe(SERVICE_PORT, router)
