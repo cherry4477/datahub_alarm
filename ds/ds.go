@@ -5,6 +5,7 @@ import "time"
 const (
 	ResultOK       = 0
 	ErrorUnmarshal = iota + 6000
+	ErrorMarshal
 )
 
 type Result struct {
