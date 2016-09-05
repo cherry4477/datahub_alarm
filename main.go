@@ -29,7 +29,7 @@ const (
 	MSGTYPE = "text"
 	AGENTID = 2
 
-	SERVICE_PORT = "localhost:8080"
+	SERVICE_PORT = "0.0.0.0:8080"
 )
 
 var (
