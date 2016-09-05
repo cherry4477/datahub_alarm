@@ -1,5 +1,7 @@
 package ds
 
+import "time"
+
 const (
 	ResultOK       = 0
 	ErrorUnmarshal = iota + 6000
@@ -28,4 +30,10 @@ type SendInfo struct {
 
 type Text struct {
 	Content string `json:"content"`
+}
+
+type AlarmEvent struct {
+	Sender    string    `json:"sender"`
+	Content   string    `json:"content"`
+	Send_time time.Time `json:"sendTime"`
 }

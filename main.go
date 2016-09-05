@@ -215,7 +215,7 @@ func refreshKafka() {
 }
 
 func sendMessage() {
-	event := alarmEvent{Sender: "wangmeng", Content: "这只是个测试", Send_time: time.Now()}
+	event := ds.AlarmEvent{Sender: "wangmeng", Content: "这只是个测试", Send_time: time.Now()}
 	log.Debug("Begin send message")
 	defer log.Debug("End send message")
 

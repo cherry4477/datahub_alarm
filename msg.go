@@ -4,21 +4,15 @@ import (
 	"encoding/json"
 	"errors"
 	log "github.com/asiainfoLDP/datahub/utils/clog"
+	"github.com/asiainfoLDP/datahub_alarm/ds"
 	"sync/atomic"
-	"time"
 )
 
 var (
-	msg                alarmEvent
+	msg                ds.AlarmEvent
 	nMqErrors          int64
 	MqListenerAnyError = errors.New("error when receiving messages")
 )
-
-type alarmEvent struct {
-	Sender    string    `json:"sender"`
-	Content   string    `json:"content"`
-	Send_time time.Time `json:"sendTime"`
-}
 
 type MyMesssageListener struct {
 	name string
