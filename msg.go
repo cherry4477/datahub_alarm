@@ -2,15 +2,15 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	log "github.com/asiainfoLDP/datahub/utils/clog"
 	"sync/atomic"
 	"time"
-	"errors"
 )
 
 var (
-	msg       alarmEvent
-	nMqErrors int64
+	msg                alarmEvent
+	nMqErrors          int64
 	MqListenerAnyError = errors.New("error when receiving messages")
 )
 

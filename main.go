@@ -11,8 +11,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"time"
 	"sync/atomic"
+	"time"
 )
 
 const (
@@ -29,7 +29,7 @@ const (
 	MSGTYPE = "text"
 	AGENTID = 2
 
-	SERVICE_PORT = "localhost:8088"
+	SERVICE_PORT = "localhost:8080"
 )
 
 var (
@@ -97,7 +97,7 @@ func sendAlarm() (bool, error) {
 
 	text := ds.Text{}
 	text.Content = msg.Content
-	info := ds.SendInfo{Touser:TOUSER, Toparty: TOPARTY, Msgtype: MSGTYPE, Agentid: AGENTID, Text: text, Safe: 0}
+	info := ds.SendInfo{Touser: TOUSER, Toparty: TOPARTY, Msgtype: MSGTYPE, Agentid: AGENTID, Text: text, Safe: 0}
 
 	body, err := json.Marshal(&info)
 	if err != nil {
@@ -121,44 +121,6 @@ func sendAlarm() (bool, error) {
 	}
 
 	return true, err
-}
-
-func main() {
-
-	go refreshAccessToken()
-
-	go refreshKafka()
-
-	sendMessage()
-
-	router := httprouter.New()
-	router.GET("/", rootHandler)
-
-	log.Info("listening on", SERVICE_PORT)
-	err := http.ListenAndServe(SERVICE_PORT, router)
-	if err != nil {
-		log.Fatal("ListenAndServe: ", err)
-	}
-}
-
-func init() {
-	corpid = getEnv("CORPID", true)
-	corpsecret = getEnv("CORPSECRET", true)
-
-	Service_Name_Kafka = getEnv("kafka_service_name", false)
-	DISCOVERY_CONSUL_SERVER_ADDR = getEnv("CONSUL_SERVER", false)
-	DISCOVERY_CONSUL_SERVER_PORT = getEnv("CONSUL_DNS_PORT", false)
-
-	initAccessToken, err := getAccessToken(corpid, corpsecret)
-	if err != nil && initAccessToken == "" {
-		log.Error("Init accessToken err:", err, initAccessToken)
-	} else {
-		accessToken = initAccessToken
-		log.Infof("Init accessToken in ticker: %s", accessToken)
-	}
-	log.Info("Accesstoken is", accessToken)
-
-	initMQ()
 }
 
 func initMQ() {
@@ -268,4 +230,40 @@ func sendMessage() {
 		return
 	}
 	return
+}
+
+func main() {
+
+	go refreshAccessToken()
+
+	go refreshKafka()
+
+	router := httprouter.New()
+	router.GET("/", rootHandler)
+
+	log.Info("listening on", SERVICE_PORT)
+	err := http.ListenAndServe(SERVICE_PORT, router)
+	if err != nil {
+		log.Fatal("ListenAndServe: ", err)
+	}
+}
+
+func init() {
+	corpid = getEnv("CORPID", true)
+	corpsecret = getEnv("CORPSECRET", true)
+
+	Service_Name_Kafka = getEnv("kafka_service_name", false)
+	DISCOVERY_CONSUL_SERVER_ADDR = getEnv("CONSUL_SERVER", false)
+	DISCOVERY_CONSUL_SERVER_PORT = getEnv("CONSUL_DNS_PORT", false)
+
+	initAccessToken, err := getAccessToken(corpid, corpsecret)
+	if err != nil && initAccessToken == "" {
+		log.Error("Init accessToken err:", err, initAccessToken)
+	} else {
+		accessToken = initAccessToken
+		log.Infof("Init accessToken in ticker: %s", accessToken)
+	}
+	log.Info("Accesstoken is", accessToken)
+
+	initMQ()
 }
