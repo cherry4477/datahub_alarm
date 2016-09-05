@@ -6,6 +6,8 @@ const (
 	ResultOK       = 0
 	ErrorUnmarshal = iota + 6000
 	ErrorMarshal
+	ErrorSendAsyncMessage
+	ErrorReadAll
 )
 
 type Result struct {

@@ -96,12 +96,12 @@ func refreshAccessToken() {
 func sendAlarm() (bool, error) {
 
 	text := ds.Text{}
-	text.Content = msg.Content
+	text.Content = fmt.Sprintf("Sender: %s\nAlarm: %s", msg.Sender, msg.Content)
 	info := ds.SendInfo{Touser: TOUSER, Toparty: TOPARTY, Msgtype: MSGTYPE, Agentid: AGENTID, Text: text, Safe: 0}
 
 	body, err := json.Marshal(&info)
 	if err != nil {
-		fmt.Println("Marshal err:", err)
+		log.Error("Marshal err:", err)
 		return false, err
 	}
 
@@ -110,15 +110,23 @@ func sendAlarm() (bool, error) {
 		"access_token=" + accessToken
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(body))
 	if err != nil {
-		fmt.Println("http.NewRequest err:", err)
+		log.Error("http.NewRequest err:", err)
 		return false, err
 	}
 
-	_, err = client.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Println("client.Do err:", err)
+		log.Error("client.Do err:", err)
 		return false, err
 	}
+	defer resp.Body.Close()
+
+	respBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Error("ioutil.ReadAll err:", err)
+		return false, err
+	}
+	log.Info(string(respBody))
 
 	return true, err
 }
@@ -145,9 +153,9 @@ func connectMQ() {
 
 	myListener := newMyMesssageListener(MQ_LISTEN_OTHERS)
 
-	AlarmMQ.SendSyncMessage(MQ_TOPIC_TO_ALARM, []byte(""), []byte("")) // force create the topic
+	//AlarmMQ.SendSyncMessage(MQ_TOPIC_TO_ALARM, []byte(""), []byte("")) // force create the topic
 	// 0 is the partition id
-	err = AlarmMQ.SetMessageListener(MQ_TOPIC_TO_ALARM, 0, mq.Offset_Marked, myListener)
+	err = AlarmMQ.SetMessageListener(MQ_TOPIC_TO_ALARM, 0, mq.Offset_Newest, myListener)
 	if err != nil {
 		log.Error("SetMessageListener (to_alarm.json) error: ", err)
 	}
@@ -240,6 +248,7 @@ func main() {
 
 	router := httprouter.New()
 	router.GET("/alarm", rootHandler)
+	router.POST("/alarm", sendMessageHandler)
 
 	log.Info("listening on", SERVICE_PORT)
 	err := http.ListenAndServe(SERVICE_PORT, router)
